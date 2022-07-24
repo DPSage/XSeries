@@ -25,6 +25,9 @@ package com.cryptomorin.xseries;
 import com.google.common.base.Enums;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 
 /**
  * <b>XMaterial</b> - Data Values/Pre-flattening<br>
@@ -66,14 +68,16 @@ import java.util.stream.Collectors;
  * @see ItemStack
  */
 public enum XMaterial {
+
+    CS_MAINFACE_MAINFACE_10FISH("CS_MAINFACE_MAINFACE_10FISH"),
     ACACIA_BOAT("BOAT_ACACIA"),
     ACACIA_BUTTON("WOOD_BUTTON"),
     ACACIA_CHEST_BOAT,
     ACACIA_DOOR("ACACIA_DOOR", "ACACIA_DOOR_ITEM"),
     ACACIA_FENCE,
     ACACIA_FENCE_GATE,
-    ACACIA_LEAVES(4, "LEAVES_2"),
-    ACACIA_LOG(4, "LOG_2"),
+    ACACIA_LEAVES("LEAVES_2"),
+    ACACIA_LOG("LOG_2"),
     ACACIA_PLANKS(4, "WOOD"),
     ACACIA_PRESSURE_PLATE("WOOD_PLATE"),
     ACACIA_SAPLING(4, "SAPLING"),
@@ -82,7 +86,7 @@ public enum XMaterial {
     ACACIA_STAIRS,
     ACACIA_TRAPDOOR("TRAP_DOOR"),
     ACACIA_WALL_SIGN("WALL_SIGN"),
-    ACACIA_WOOD(4, "LOG_2"),
+    ACACIA_WOOD("LOG_2"),
     ACTIVATOR_RAIL,
     /**
      * https://minecraft.gamepedia.com/Air
@@ -388,8 +392,8 @@ public enum XMaterial {
     DARK_OAK_DOOR("DARK_OAK_DOOR", "DARK_OAK_DOOR_ITEM"),
     DARK_OAK_FENCE,
     DARK_OAK_FENCE_GATE,
-    DARK_OAK_LEAVES(5, "LEAVES_2"),
-    DARK_OAK_LOG(5, "LOG_2"),
+    DARK_OAK_LEAVES(1, "LEAVES_2"),
+    DARK_OAK_LOG(1, "LOG_2"),
     DARK_OAK_PLANKS(5, "WOOD"),
     DARK_OAK_PRESSURE_PLATE("WOOD_PLATE"),
     DARK_OAK_SAPLING(5, "SAPLING"),
@@ -398,7 +402,7 @@ public enum XMaterial {
     DARK_OAK_STAIRS,
     DARK_OAK_TRAPDOOR("TRAP_DOOR"),
     DARK_OAK_WALL_SIGN("WALL_SIGN"),
-    DARK_OAK_WOOD(5, "LOG_2"),
+    DARK_OAK_WOOD(1, "LOG_2"),
     DARK_PRISMARINE(2, "PRISMARINE"),
     DARK_PRISMARINE_SLAB,
     DARK_PRISMARINE_STAIRS,
@@ -845,21 +849,21 @@ public enum XMaterial {
     MULE_SPAWN_EGG(32, "MONSTER_EGG"),
     MUSHROOM_STEM("BROWN_MUSHROOM"),
     MUSHROOM_STEW("MUSHROOM_SOUP"),
-    MUSIC_DISC_11("RECORD_11"),
-    MUSIC_DISC_13("GOLD_RECORD"),
+    MUSIC_DISC_11("GOLD_RECORD"),
+    MUSIC_DISC_13("GREEN_RECORD"),
     MUSIC_DISC_5,
     MUSIC_DISC_BLOCKS("RECORD_3"),
-    MUSIC_DISC_CAT("GREEN_RECORD"),
-    MUSIC_DISC_CHIRP("RECORD_4"),
-    MUSIC_DISC_FAR("RECORD_5"),
-    MUSIC_DISC_MALL("RECORD_6"),
-    MUSIC_DISC_MELLOHI("RECORD_7"),
+    MUSIC_DISC_CAT("RECORD_4"),
+    MUSIC_DISC_CHIRP("RECORD_5"),
+    MUSIC_DISC_FAR("RECORD_6"),
+    MUSIC_DISC_MALL("RECORD_7"),
+    MUSIC_DISC_MELLOHI("RECORD_8"),
     MUSIC_DISC_OTHERSIDE,
     MUSIC_DISC_PIGSTEP,
-    MUSIC_DISC_STAL("RECORD_8"),
-    MUSIC_DISC_STRAD("RECORD_9"),
-    MUSIC_DISC_WAIT("RECORD_12"),
-    MUSIC_DISC_WARD("RECORD_10"),
+    MUSIC_DISC_STAL("RECORD_9"),
+    MUSIC_DISC_STRAD("RECORD_10"),
+    MUSIC_DISC_WAIT("RECORD_11"),
+    MUSIC_DISC_WARD("RECORD_12"),
     MUTTON,
     MYCELIUM("MYCEL"),
     NAME_TAG,
@@ -1261,22 +1265,22 @@ public enum XMaterial {
     STRAY_SPAWN_EGG(6, "MONSTER_EGG"),
     STRIDER_SPAWN_EGG,
     STRING,
-    STRIPPED_ACACIA_LOG,
-    STRIPPED_ACACIA_WOOD,
-    STRIPPED_BIRCH_LOG,
-    STRIPPED_BIRCH_WOOD,
+    STRIPPED_ACACIA_LOG("LOG_2"),
+    STRIPPED_ACACIA_WOOD("LOG_2"),
+    STRIPPED_BIRCH_LOG(2, "LOG"),
+    STRIPPED_BIRCH_WOOD(2, "LOG"),
     STRIPPED_CRIMSON_HYPHAE,
     STRIPPED_CRIMSON_STEM,
-    STRIPPED_DARK_OAK_LOG,
-    STRIPPED_DARK_OAK_WOOD,
-    STRIPPED_JUNGLE_LOG,
-    STRIPPED_JUNGLE_WOOD,
+    STRIPPED_DARK_OAK_LOG("LOG"),
+    STRIPPED_DARK_OAK_WOOD("LOG"),
+    STRIPPED_JUNGLE_LOG(3, "LOG"),
+    STRIPPED_JUNGLE_WOOD(3, "LOG"),
     STRIPPED_MANGROVE_LOG,
     STRIPPED_MANGROVE_WOOD,
-    STRIPPED_OAK_LOG,
-    STRIPPED_OAK_WOOD,
-    STRIPPED_SPRUCE_LOG,
-    STRIPPED_SPRUCE_WOOD,
+    STRIPPED_OAK_LOG("LOG"),
+    STRIPPED_OAK_WOOD("LOG"),
+    STRIPPED_SPRUCE_LOG(1, "LOG"),
+    STRIPPED_SPRUCE_WOOD(1, "LOG"),
     STRIPPED_WARPED_HYPHAE,
     STRIPPED_WARPED_STEM,
     STRUCTURE_BLOCK,
@@ -1443,8 +1447,7 @@ public enum XMaterial {
     ZOMBIE_SPAWN_EGG(54, "MONSTER_EGG"),
     ZOMBIE_VILLAGER_SPAWN_EGG(27, "MONSTER_EGG"),
     ZOMBIE_WALL_HEAD(2, "SKULL", "SKULL_ITEM"),
-    ZOMBIFIED_PIGLIN_SPAWN_EGG(57, "MONSTER_EGG", "ZOMBIE_PIGMAN_SPAWN_EGG"),
-    CS_MAINFACE_MAINFACE_10FISH("CS_MAINFACE_MAINFACE_10FISH");
+    ZOMBIFIED_PIGLIN_SPAWN_EGG(57, "MONSTER_EGG", "ZOMBIE_PIGMAN_SPAWN_EGG");
 
 
     /**
@@ -1669,7 +1672,7 @@ public enum XMaterial {
      */
     @Nonnull
     public static Optional<XMaterial> matchXMaterial(@Nonnull String name) {
-        if (name == null || name.isEmpty()) throw new IllegalArgumentException("Cannot match a material with null or empty material name");
+        Validate.notEmpty(name, "Cannot match a material with null or empty material name");
         Optional<XMaterial> oldMatch = matchXMaterialWithData(name);
         return oldMatch.isPresent() ? oldMatch : matchDefinedXMaterial(format(name), UNKNOWN_DATA_VALUE);
     }
@@ -1698,7 +1701,7 @@ public enum XMaterial {
             String mat = format(name.substring(0, index));
             try {
                 // We don't use Byte.parseByte because we have our own range check.
-                byte data = (byte) Integer.parseInt(name.substring(index + 1).replace(" ", ""));
+                byte data = (byte) Integer.parseInt(StringUtils.deleteWhitespace(name.substring(index + 1)));
                 return data >= 0 && data < MAX_DATA_VALUE ? matchDefinedXMaterial(mat, data) : matchDefinedXMaterial(mat, UNKNOWN_DATA_VALUE);
             } catch (NumberFormatException ignored) {
                 return matchDefinedXMaterial(mat, UNKNOWN_DATA_VALUE);
@@ -1741,8 +1744,8 @@ public enum XMaterial {
         String material = item.getType().name();
         byte data = (byte) (Data.ISFLAT || item.getType().getMaxDurability() > 0 ? 0 : item.getDurability());
 
-        // Versions 1.9-1.12 didn't really use the items data value.
-        if (supports(9) && !supports(13) && item.hasItemMeta() && material.equals("MONSTER_EGG")) {
+        // They didn't really use the items data value in older versions.
+        if (!Data.ISFLAT && item.hasItemMeta() && material.equals("MONSTER_EGG")) {
             ItemMeta meta = item.getItemMeta();
             if (meta instanceof SpawnEggMeta) {
                 SpawnEggMeta egg = (SpawnEggMeta) meta;
@@ -2055,9 +2058,7 @@ public enum XMaterial {
     @Override
     @Nonnull
     public String toString() {
-        return Arrays.stream(name().split("_"))
-                .map(t -> t.charAt(0) + t.substring(1).toLowerCase())
-                .collect(Collectors.joining(" "));
+        return WordUtils.capitalize(this.name().replace('_', ' ').toLowerCase(Locale.ENGLISH));
     }
 
     /**

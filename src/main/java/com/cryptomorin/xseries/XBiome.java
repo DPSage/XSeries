@@ -22,6 +22,7 @@
 package com.cryptomorin.xseries;
 
 import com.google.common.base.Enums;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -239,7 +240,7 @@ public enum XBiome {
      */
     @Nonnull
     public static Optional<XBiome> matchXBiome(@Nonnull String biome) {
-        if (biome == null || biome.isEmpty()) throw new IllegalArgumentException("Cannot match XBiome of a null or empty biome name");
+        Validate.notEmpty(biome, "Cannot match XBiome of a null or empty biome name");
         return Optional.ofNullable(Data.NAMES.get(format(biome)));
     }
 
@@ -295,7 +296,7 @@ public enum XBiome {
         Objects.requireNonNull(biome, () -> "Unsupported biome: " + this.name());
         Objects.requireNonNull(chunk, "Cannot set biome of null chunk");
         if (!chunk.isLoaded()) {
-            if (!chunk.load(true)) throw new IllegalStateException("Could not load chunk at " + chunk.getX() + ", " + chunk.getZ());
+            Validate.isTrue(chunk.load(true), "Could not load chunk at " + chunk.getX() + ", " + chunk.getZ());
         }
         int heightMax = HORIZONTAL_SUPPORT ? chunk.getWorld().getMaxHeight() : 1;
         int heightMin = EXTENDED_MINIMUM ? chunk.getWorld().getMinHeight() : 0;
@@ -336,7 +337,7 @@ public enum XBiome {
         Objects.requireNonNull(biome, () -> "Unsupported biome: " + this.name());
 
         World world = start.getWorld(); // Avoid getting from weak reference in a loop.
-        if (!world.getUID().equals(end.getWorld().getUID())) throw new IllegalArgumentException("Location worlds mismatch");
+        Validate.isTrue(world.getUID().equals(end.getWorld().getUID()), "Location worlds mismatch");
         int heightMax = HORIZONTAL_SUPPORT ? world.getMaxHeight() : 1;
         int heightMin = EXTENDED_MINIMUM ? world.getMinHeight() : 0;
 

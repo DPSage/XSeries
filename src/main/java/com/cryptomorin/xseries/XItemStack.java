@@ -24,6 +24,8 @@ package com.cryptomorin.xseries;
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -73,7 +75,7 @@ import static com.cryptomorin.xseries.XMaterial.supports;
  * ItemStack: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/inventory/ItemStack.html
  *
  * @author Crypto Morin
- * @version 7.2.0.1
+ * @version 7.2.0
  * @see XMaterial
  * @see XPotion
  * @see SkullUtils
@@ -123,7 +125,7 @@ public final class XItemStack {
         if (meta.hasLore()) config.set("lore", meta.getLore()); // TODO Add a method to "untranslate" color codes.
 
         if (supports(14)) {
-            if (meta.hasCustomModelData()) config.set("custom-model-data", meta.getCustomModelData());
+            if (meta.hasCustomModelData()) config.set("custom-model", meta.getCustomModelData());
         }
         if (supports(11)) {
             if (meta.isUnbreakable()) config.set("unbreakable", true);
@@ -282,12 +284,12 @@ public final class XItemStack {
                     view.set("unlimited-tracking", mapView.isUnlimitedTracking());
                 }
             }
-        } else if (supports(17)) {
-            /*if (meta instanceof AxolotlBucketMeta) {
+        } /*else if (supports(17)) {
+            if (meta instanceof AxolotlBucketMeta) {
                 AxolotlBucketMeta bucket = (AxolotlBucketMeta) meta;
                 if (bucket.hasVariant()) config.set("color", bucket.getVariant().toString());
-            }*/
-        } else if (supports(16)) {
+            }
+        }*/ else if (supports(16)) {
             if (meta instanceof CompassMeta) {
                 CompassMeta compass = (CompassMeta) meta;
                 ConfigurationSection subSection = config.createSection("lodestone");
@@ -434,42 +436,6 @@ public final class XItemStack {
         return deserialize(mapToConfigSection(serializedItem), translator);
     }
 
-    private static int toInt(String str, @SuppressWarnings("SameParameterValue") int defaultValue) {
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException nfe) {
-            return defaultValue;
-        }
-    }
-
-    private static List<String> split(@Nonnull String str, @SuppressWarnings("SameParameterValue") char separatorChar) {
-        List<String> list = new ArrayList<>(5);
-        boolean match = false, lastMatch = false;
-        int len = str.length();
-        int start = 0;
-
-        for (int i = 0; i < len; i++) {
-            if (str.charAt(i) == separatorChar) {
-                if (match) {
-                    list.add(str.substring(start, i));
-                    match = false;
-                    lastMatch = true;
-                }
-
-                // This is important, it should not be i++
-                start = i + 1;
-                continue;
-            }
-
-            lastMatch = false;
-            match = true;
-        }
-
-        if (match || lastMatch) {
-            list.add(str.substring(start, len));
-        }
-        return list;
-    }
 
     /**
      * Deserialize an ItemStack from the config.
@@ -497,7 +463,6 @@ public final class XItemStack {
             if (materialOpt.isPresent()) material = materialOpt.get();
             else {
                 UnknownMaterialCondition unknownMaterialCondition = new UnknownMaterialCondition(materialName);
-                if (restart == null) throw unknownMaterialCondition;
                 restart.accept(unknownMaterialCondition);
 
                 if (unknownMaterialCondition.hasSolution()) material = unknownMaterialCondition.solution;
@@ -506,7 +471,6 @@ public final class XItemStack {
 
             if (!material.isSupported()) {
                 UnAcceptableMaterialCondition unsupportedMaterialCondition = new UnAcceptableMaterialCondition(material, UnAcceptableMaterialCondition.Reason.UNSUPPORTED);
-                if (restart == null) throw unsupportedMaterialCondition;
                 restart.accept(unsupportedMaterialCondition);
 
                 if (unsupportedMaterialCondition.hasSolution()) material = unsupportedMaterialCondition.solution;
@@ -514,7 +478,6 @@ public final class XItemStack {
             }
             if (XTag.INVENTORY_NOT_DISPLAYABLE.isTagged(material)) {
                 UnAcceptableMaterialCondition unsupportedMaterialCondition = new UnAcceptableMaterialCondition(material, UnAcceptableMaterialCondition.Reason.NOT_DISPLAYABLE);
-                if (restart == null) throw unsupportedMaterialCondition;
                 restart.accept(unsupportedMaterialCondition);
 
                 if (unsupportedMaterialCondition.hasSolution()) material = unsupportedMaterialCondition.solution;
@@ -576,10 +539,10 @@ public final class XItemStack {
 
                 String baseEffect = config.getString("base-effect");
                 if (!Strings.isNullOrEmpty(baseEffect)) {
-                    List<String> split = split(baseEffect, ',');
-                    PotionType type = Enums.getIfPresent(PotionType.class, split.get(0).trim().toUpperCase(Locale.ENGLISH)).or(PotionType.UNCRAFTABLE);
-                    boolean extended = split.size() != 1 && Boolean.parseBoolean(split.get(1).trim());
-                    boolean upgraded = split.size() > 2 && Boolean.parseBoolean(split.get(2).trim());
+                    String[] split = StringUtils.split(baseEffect, ',');
+                    PotionType type = Enums.getIfPresent(PotionType.class, split[0].trim().toUpperCase(Locale.ENGLISH)).or(PotionType.UNCRAFTABLE);
+                    boolean extended = split.length != 1 && Boolean.parseBoolean(split[1].trim());
+                    boolean upgraded = split.length > 2 && Boolean.parseBoolean(split[2].trim());
                     PotionData potionData = new PotionData(type, extended, upgraded);
                     potion.setBasePotionData(potionData);
                 }
@@ -593,10 +556,10 @@ public final class XItemStack {
                     int level = config.getInt("level");
                     String baseEffect = config.getString("base-effect");
                     if (!Strings.isNullOrEmpty(baseEffect)) {
-                        List<String> split = split(baseEffect, ',');
-                        PotionType type = Enums.getIfPresent(PotionType.class, split.get(0).trim().toUpperCase(Locale.ENGLISH)).or(PotionType.SLOWNESS);
-                        boolean extended = split.size() != 1 && Boolean.parseBoolean(split.get(1).trim());
-                        boolean splash = split.size() > 2 && Boolean.parseBoolean(split.get(2).trim());
+                        String[] split = StringUtils.split(baseEffect, ',');
+                        PotionType type = Enums.getIfPresent(PotionType.class, split[0].trim().toUpperCase(Locale.ENGLISH)).or(PotionType.SLOWNESS);
+                        boolean extended = split.length != 1 && Boolean.parseBoolean(split[1].trim());
+                        boolean splash = split.length > 2 && Boolean.parseBoolean(split[2].trim());
 
                         item = (new Potion(type, level, splash, extended)).toItemStack(1);
                     }
@@ -617,7 +580,7 @@ public final class XItemStack {
                     ShulkerBox box = (ShulkerBox) state;
                     for (String key : shulkerSection.getKeys(false)) {
                         ItemStack boxItem = deserialize(shulkerSection.getConfigurationSection(key));
-                        int slot = toInt(key, 0);
+                        int slot = NumberUtils.toInt(key, 0);
                         box.getInventory().setItem(slot, boxItem);
                     }
                     box.update(true);
@@ -725,16 +688,16 @@ public final class XItemStack {
                     }
                 }
             }
-        } else if (supports(17)) {
-            /*if (meta instanceof AxolotlBucketMeta) {
+        } /*else if (supports(17)) {
+            if (meta instanceof AxolotlBucketMeta) {
                 AxolotlBucketMeta bucket = (AxolotlBucketMeta) meta;
                 String variantStr = config.getString("color");
                 if (variantStr != null) {
                     Axolotl.Variant variant = Enums.getIfPresent(Axolotl.Variant.class, variantStr.toUpperCase(Locale.ENGLISH)).or(Axolotl.Variant.BLUE);
                     bucket.setVariant(variant);
                 }
-            }*/
-        } else if (supports(16)) {
+            }
+        }*/ else if (supports(16)) {
             if (meta instanceof CompassMeta) {
                 CompassMeta compass = (CompassMeta) meta;
                 compass.setLodestoneTracked(config.getBoolean("tracked"));
@@ -811,47 +774,35 @@ public final class XItemStack {
 
         // Custom Model Data
         if (supports(14)) {
-            int modelData = config.getInt("custom-model-data");
+            int modelData = config.getInt("model-data");
             if (modelData != 0) meta.setCustomModelData(modelData);
         }
 
         // Lore
-        if (config.isSet("lore")) {
-            List<String> translatedLore;
-            List<String> lores = config.getStringList("lore");
-            if (!lores.isEmpty()) {
-                translatedLore = new ArrayList<>(lores.size());
+        List<String> translatedLore;
+        List<String> lores = config.getStringList("lore");
+        if (!lores.isEmpty()) {
+            translatedLore = new ArrayList<>(lores.size());
 
-                for (String lore : lores) {
-                    if (lore.isEmpty()) {
+            for (String lore : lores) {
+                if (lore.isEmpty()) {
+                    translatedLore.add(" ");
+                    continue;
+                }
+
+                for (String singleLore : splitNewLine(lore)) {
+                    if (singleLore.isEmpty()) {
                         translatedLore.add(" ");
                         continue;
                     }
-
-                    for (String singleLore : splitNewLine(lore)) {
-                        if (singleLore.isEmpty()) {
-                            translatedLore.add(" ");
-                            continue;
-                        }
-                        translatedLore.add(translator.apply(singleLore));
-                    }
-                }
-            } else {
-                String lore = config.getString("lore");
-                translatedLore = new ArrayList<>(10);
-
-                if (!Strings.isNullOrEmpty(lore)) {
-                    for (String singleLore : splitNewLine(lore)) {
-                        if (singleLore.isEmpty()) {
-                            translatedLore.add(" ");
-                            continue;
-                        }
-                        translatedLore.add(translator.apply(singleLore));
-                    }
+                    translatedLore.add(translator.apply(singleLore));
                 }
             }
 
             meta.setLore(translatedLore);
+        } else {
+            String lore = config.getString("lore");
+            if (!Strings.isNullOrEmpty(lore)) meta.setLore(Collections.singletonList(translator.apply(lore)));
         }
 
         // Enchantments
@@ -998,9 +949,9 @@ public final class XItemStack {
     @Nonnull
     public static Color parseColor(@Nullable String str) {
         if (Strings.isNullOrEmpty(str)) return Color.BLACK;
-        List<String> rgb = split(str.replace(" ", ""), ',');
-        if (rgb.size() < 3) return Color.WHITE;
-        return Color.fromRGB(toInt(rgb.get(0), 0), toInt(rgb.get(1), 0), toInt(rgb.get(2), 0));
+        String[] rgb = StringUtils.split(StringUtils.deleteWhitespace(str), ',');
+        if (rgb.length < 3) return Color.WHITE;
+        return Color.fromRGB(NumberUtils.toInt(rgb[0], 0), NumberUtils.toInt(rgb[1], 0), NumberUtils.toInt(rgb[2], 0));
     }
 
     /**
