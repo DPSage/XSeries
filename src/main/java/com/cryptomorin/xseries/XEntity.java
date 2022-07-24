@@ -448,7 +448,7 @@ public final class XEntity {
      * AXOLOTL - GLOW_ITEM_FRAME - GLOW_SQUID - GOAT - MARKER
      */
     private static boolean seventeen(Entity entity, ConfigurationSection config) {
-        if (entity instanceof Axolotl) {
+        /*if (entity instanceof Axolotl) {
             Axolotl axolotl = (Axolotl) entity;
             String variantStr = config.getString("variant");
             if (Strings.isNullOrEmpty(variantStr)) {
@@ -470,7 +470,7 @@ public final class XEntity {
             GlowSquid glowSquid = (GlowSquid) entity;
             if (config.isSet("dark-ticks-remaining")) glowSquid.setDarkTicksRemaining(config.getInt("dark-ticks-remaining"));
             return true;
-        }
+        }*/
 
         return false;
     }

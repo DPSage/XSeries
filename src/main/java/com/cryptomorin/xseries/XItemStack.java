@@ -36,7 +36,7 @@ import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Axolotl;
+//import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TropicalFish;
@@ -283,10 +283,10 @@ public final class XItemStack {
                 }
             }
         } else if (supports(17)) {
-            if (meta instanceof AxolotlBucketMeta) {
+            /*if (meta instanceof AxolotlBucketMeta) {
                 AxolotlBucketMeta bucket = (AxolotlBucketMeta) meta;
                 if (bucket.hasVariant()) config.set("color", bucket.getVariant().toString());
-            }
+            }*/
         } else if (supports(16)) {
             if (meta instanceof CompassMeta) {
                 CompassMeta compass = (CompassMeta) meta;
@@ -726,14 +726,14 @@ public final class XItemStack {
                 }
             }
         } else if (supports(17)) {
-            if (meta instanceof AxolotlBucketMeta) {
+            /*if (meta instanceof AxolotlBucketMeta) {
                 AxolotlBucketMeta bucket = (AxolotlBucketMeta) meta;
                 String variantStr = config.getString("color");
                 if (variantStr != null) {
                     Axolotl.Variant variant = Enums.getIfPresent(Axolotl.Variant.class, variantStr.toUpperCase(Locale.ENGLISH)).or(Axolotl.Variant.BLUE);
                     bucket.setVariant(variant);
                 }
-            }
+            }*/
         } else if (supports(16)) {
             if (meta instanceof CompassMeta) {
                 CompassMeta compass = (CompassMeta) meta;
